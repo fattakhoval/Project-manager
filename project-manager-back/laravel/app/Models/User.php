@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+use App\Models\Role;
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -45,4 +47,29 @@ class User extends Authenticatable
     public function project(){
         return $this->belongsTo(Project::class);
     }
+
+    public function roles(){
+        return $this->belongsToMany(Role::class);
+    }
+
+    public function hasRole($roleName){
+        return $this->roles()->where('name', $roleName)->exists();
+    }
+
+    public function hasPrimission($premissionName){
+        return $this->roles()->whereHas('permission', function($query) use ($premissionName){
+            $query->where('name', $premissionName);
+        })->exists();
+    }
+
+    public function assignRole($role){
+        if(in_array($role, ['Админ', 'Руководитель проекта', 'Исполнитель'])){
+            $this->role = $role;
+            $this->save();
+        }
+    }
+
+
+
+
 }
