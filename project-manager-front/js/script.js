@@ -22,4 +22,25 @@ $(document).ready(()=>{
             }
         })
     });
-})
+
+
+
+
+    $('#signin_form').on('submit', (event)=>{
+        event.preventDefault();
+
+        $.ajax({
+            url:"http://prod-man-public/api/admin//users/signin",
+            method:"POST",
+            data: $("#signin_form").serialize(),
+            success:(response)=>{
+                console.log(response);
+            },
+            error: (xhr, status, error) => {
+                console.log("Ошибка создания:", xhr.responseText);
+            }
+        })
+    })
+});
+
+

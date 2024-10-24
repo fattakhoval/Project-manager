@@ -17,7 +17,8 @@ class AuthController extends Controller
         $request->validate([
             'name'=>'required|string|max:255',
             'email'=>'required|email|unique:users',
-            'password'=>'required|string|min:8'
+            'password'=>'required|string|min:8',
+            'role'=>'required',
         ]);
 
         $plainPassword = $request->password;
@@ -26,7 +27,7 @@ class AuthController extends Controller
             'name'=>$request->name,
             'email'=>$request->email,
             'password'=>Hash::make($plainPassword),
-            'role'=>$request->postjob,
+            'role'=>$request->role,
         ]);
 
         return response()->json([

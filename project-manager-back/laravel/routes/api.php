@@ -28,6 +28,8 @@ use App\Http\Controllers\AuthController;
 
 Route::prefix('admin')->group(function(){
     Route::post('/users', [AuthController::class, 'createUser'])->name('users.create');
+    Route::post('/users/signin', [AuthController::class, 'signin'])->name('signin');
+
     Route::post('/users/{id}', [AuthController::class, 'update'])->name('users.update');
     Route::delete('/users/{id}', [AuthController::class, 'destroy'])->name('users.destroy');
 
