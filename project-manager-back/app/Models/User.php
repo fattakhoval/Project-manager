@@ -43,6 +43,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
 
     public function project(){
@@ -63,10 +64,14 @@ class User extends Authenticatable
         })->exists();
     }
 
-    public function assignRole($role){
-        if(in_array($role, ['Админ', 'Руководитель проекта', 'Исполнитель'])){
+    public function assignRole($role)
+    {
+        // Проверяем, что роль допустима
+        if (in_array($role, ['Админ', 'Руководитель проекта', 'Исполнитель'])) {
             $this->role = $role;
-            $this->save();
+            $this->save(); // Сохраняем изменения в базе данных
+        } else {
+            throw new \InvalidArgumentException("Недопустимая роль: $role");
         }
     }
 

@@ -7,27 +7,36 @@ use Illuminate\Database\Eloquent\Model;
 
 class Task extends Model
 {
+
+    public $timestamps = false;
+
     protected $fillable = [
         'title',
         'description',
-        'projects_id',
+        'project_id',
         'user_id',
         'priority',
-        'date_start',
-        'date_end',
-        'status'
+        'start_date',
+        'end_date',
+        'status',
     ];
 
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+    ];
     public function project()
     {
         return $this->belongsTo(Project::class);
     }
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function comments(){
+    public function comments()
+    {
         return $this->hasMany(Comment::class);
     }
 }

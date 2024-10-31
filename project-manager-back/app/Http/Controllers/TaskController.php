@@ -16,15 +16,15 @@ class TaskController extends Controller
     public function createTask(Request $request)
     {
         $validateData = $request->validate([
-            'title'=>'required|string|max:255',
-            'description'=>'required|string',
-            'projects_id'=>'required|exists:projects,id',
-            'user_id'=>'required|exists:users,id',
-            'priority'=>'required|in:Низкий,Средний,Высокий',
-            'date_start'=>'nullable|date',
-            'date_end'=>'nullable|date|after:date_start',
-            'status'=>'required|in:Неназначена,Выполняется,Завершена'
-
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'project_id' => 'required|exists:projects,id',
+            'user_id' => 'required|exists:users,id',
+            'priority' => 'required|in:Низкий,Средний,Высокий',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after:start_date',
+            'status' => 'required|in:Назначена,Выполняется,Завершена',
+     
         ]);
 
         $task = Task::create($validateData);
@@ -104,13 +104,30 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function getAssignesTasks(Request $request)
+    public function getAssignedTasks(Request $request)
     {
-        $userId = auth()->id();
+        // Валидация входных данных
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+    
         $perPage = $request->input('per_page', 10);
-
-        $tasks = Task::where('user_id', $userId)->paginate($perPage);
-        
+    
+        // Получаем задачи, назначенные пользователю
+        $tasks = Task::where('user_id', $validated['user_id'])
+            ->paginate($perPage)
+            ->map(function ($task) {
+                return [
+                    'id' => $task->id,
+                    'title' => $task->title,
+                    'description' => $task->description,
+                    'status' => $task->status,
+                    'priority' => $task->priority,
+                    'date_end' => $task->date_end,
+                    // Добавьте другие поля, если необходимо
+                ];
+            });
+    
         return response()->json($tasks, 200);
     }
 
@@ -147,5 +164,10 @@ class TaskController extends Controller
         $comments = $task->comments;
 
         return response()->json($comments);
+    }
+
+    public function index(Request $request){
+        $tasks = Task::all();
+        return response()->json($tasks, 200);
     }
 }
